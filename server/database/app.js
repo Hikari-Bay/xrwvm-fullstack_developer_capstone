@@ -58,17 +58,57 @@ app.get('/fetchReviews/dealer/:id', async (req, res) => {
 
 // Express route to fetch all dealerships
 app.get('/fetchDealers', async (req, res) => {
-//Write your code here
+    console.log("Fetching all dealers..."); // Log added chatgpt
+    try{
+      // const documents = await Dealers.find();
+      const documents = await Dealerships.find(); //why?
+      console.log("Fetched dealers:", documents); // Log the result chatgpt
+      res.json(documents);
+    }catch(error) {
+      console .error("Error fetching dealers:", error);//why adding this line 
+      res.status(500).json({ error: 'Error fetching documents' })
+    }
 });
 
 // Express route to fetch Dealers by a particular state
 app.get('/fetchDealers/:state', async (req, res) => {
-//Write your code here
+    try {
+        // const documents = await Reviews.find({dealership: req.params.id});example
+        // const documents = await Dealers.find({dealership: req.params.state});
+        const documents = await Dealerships.find({state: req.params.state});
+      
+        if (documents.length === 0) {
+          return res.status(404).json({ error: "No dealers found in this state"});
+        }
+        res.json(documents);
+      } catch(error) {
+        console.error("Error fetching dealers by state:", error );// adding this line why?
+        res.status(500).json({ error: 'Error fetching documents' });
+      }
 });
 
 // Express route to fetch dealer by a particular id
 app.get('/fetchDealer/:id', async (req, res) => {
 //Write your code here
+try{
+  const document = await Dealerships.findOne({ id: req.params.id });
+  
+  
+  if (!document) {
+    return res.status(404).json({ error: "Dealer not found"});
+    }
+  
+    res.json(document)
+  } catch (error) {
+    console.error("Error fetching dealer by ID:", error);
+  
+    // More specific error handling for invalid ObjectId
+    if (error.kind === 'ObjectId') {
+      return res.status(400).json({ error: "Invalid Dealer ID format "});
+    }
+  
+    res.status(500).json({ error: "Error fetching dealer"});
+  }
 });
 
 //Express route to insert review
